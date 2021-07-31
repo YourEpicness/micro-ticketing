@@ -3,6 +3,7 @@ import express, {Request, Response} from 'express';
 import {body, validationResult} from 'express-validator'; // can validate body, strings, etc
 import { RequestValidationError } from '../errors/request-validation-error';
 import { DatabaseConnectionError } from '../errors/database-connection-error';
+import { User } from '../models/user';
 const router = express.Router();
 
 // TODO: Automated API Integration Test for proper signup validation
@@ -22,13 +23,20 @@ router.post('/api/users/signup',[
         throw new RequestValidationError(errors.array());
     }
 
-    const {email, password} = req.body;
+    const { email, password} = req.body;
 
-    console.log('Creating a user...');
-    throw new DatabaseConnectionError();
+    const existingUser = await User.findOne({ email});
+    if(existingUser) {
+        console.log('Email in use');
+        return res.send({})
+    }
     
-    res.send({});
-    // user validation
+    // creates and saves user to mongodb
+    const user = User.build({ email, password})
+    await user.save();
+
+    // user created
+    res.status(201).send(user);
 
 
 })

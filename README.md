@@ -37,3 +37,27 @@ interface CustomError {
 - Option 2: Use an abstract class for each error types. Abstract class is useful in this case because interfaces will not exist when compiled to JS. Abstract classes will remain which allow us to utilize the instanceof statement for checks.
 - throw new Error('') is still very useful for server logs. It is called in the super(). We can pass in a message through the abstract class's super().
 - Currently, code is refactored so that there is no duplicate code in the middleware and proper type declarations are created.
+- Problem: Can't catch asynchronous errors. Solution: use express async errors npm package to allow async/await usage
+
+## Mongoose and Typescript
+- To get mongoose and typescript to work peropely together create a function called buildExample and pass in the interface that matches the model like below
+    ```
+    const buildUser = (attr: UserAttrs) => {
+        return new User(attrs);
+    }
+    ```
+- Another almost better improvement is to define a usermodel interface so Typescript plays nice
+    ```
+    interface UserModel extends mongoose.Model<any> {
+        build(attrs: UserAttrs): any;
+    }
+
+    const User = mongoose.model<any,UserModel>('User', userSchema);
+
+    // to test typescript
+    User.build({
+        email: 'test@test.com',
+        password: 'password'
+    })
+    ```
+- Angle brackets are generic syntax for typescript which allows for assigning types in a class and stuff
