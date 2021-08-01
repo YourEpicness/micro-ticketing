@@ -61,3 +61,23 @@ interface CustomError {
     })
     ```
 - Angle brackets are generic syntax for typescript which allows for assigning types in a class and stuff
+
+Classes
+- static methods are methods accessible without having to create an instance of the class
+
+Password Hashing/ Auth Service
+- passwords SHOULD NOT be stored in plain text in the database
+- We have to hash the password somehow and store into the database
+- libraries such as crypto provide useful ways to hash passwords and other things. 
+- Downside is that crypto is a callback library which is synchronous, so we need to use a library such as promisify to convert it into a Promise which is asynchronous to be used in the appplication
+
+## Authentication Strategies
+Note: sync request refers to directly talking to another service
+
+Approaches to handling authentication
+1. Individual services rely on some central auth service. We have cookie, JWT, etc and send to the auth service. Auth service would contain logic to decide if user us authenticated. 
+   - Downside is that since its synchronous, if the auth service connection goes down, the whole applicaiton goes down. This option promotes tight coupling.
+   1.1. Individual services use auth service as a gateway/proxy. Same problems still apply.
+2. Individual services know how to authenticate a user. Ex: if there is a request to purchase a ticket, the order service would have the logic available to determine whether the user is authenticated or not. This causes duplication of auth logic which could also be used in a shared library for other services.
+   - Upside: not relying on auth service. Auth service could fail and logic for the order service would still work
+   - Downside: Updating user permissions won't work because the service is decoupled. Any requests that would require some information from the database won't work since auth logic is already inside the service

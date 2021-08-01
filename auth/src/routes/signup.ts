@@ -4,6 +4,7 @@ import {body, validationResult} from 'express-validator'; // can validate body, 
 import { RequestValidationError } from '../errors/request-validation-error';
 import { DatabaseConnectionError } from '../errors/database-connection-error';
 import { User } from '../models/user';
+import { BadRequestError } from '../errors/bad-request-error';
 const router = express.Router();
 
 // TODO: Automated API Integration Test for proper signup validation
@@ -27,8 +28,7 @@ router.post('/api/users/signup',[
 
     const existingUser = await User.findOne({ email});
     if(existingUser) {
-        console.log('Email in use');
-        return res.send({})
+        throw new BadRequestError('Email is already in use');
     }
     
     // creates and saves user to mongodb
