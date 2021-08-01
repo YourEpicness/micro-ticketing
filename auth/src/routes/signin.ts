@@ -1,6 +1,10 @@
 import express, { Request, Response} from 'express';
-import { body, validationResult } from 'express-validator';
-import { RequestValidationError } from '../errors/request-validation-error';
+import { body} from 'express-validator';
+import { BadRequestError } from '../errors/bad-request-error';
+import { validateRequest } from '../middlewares/validate-request';
+import { User } from '../models/user';
+import { Password } from '../services/password';
+import jwt from 'jsonwebtoken';
 const router = express.Router();
 
 router.post('/api/users/signin', [
@@ -12,12 +16,37 @@ router.post('/api/users/signin', [
     .trim()
     .notEmpty()
     .withMessage('You must supply a password')
-], (req: Request, res: Response) => {
-    // error handling using express-validator {body, validationResult}
-    const errors = validationResult(req);
-    if(!errors.isEmpty()) {
-        throw new RequestValidationError(errors.array());
+], validateRequest, 
+async (req: Request, res: Response) => {
+    // grab properties off the body
+    const {email, password} = req.body;
+
+    // check if user already exists and throw a general error
+    const existingUser = await User.findOne({email});
+    if (!existingUser) {
+        throw new BadRequestError('Invalid credentials');
     }
+
+    // check if passwords for users match
+    const passwordsMatch = await Password.compare(existingUser.password, password);
+    if(!passwordsMatch) {
+        throw new BadRequestError('Invalid credentials')
+    }
+
+    // generate JWT
+    const userJwt = jwt.sign({
+        id: existingUser.id,
+        email: existingUser.email
+    }, process.env.JWT_KEY!); // use ! to make typescript happy :)
+
+    // store it on session object
+    req.session = {
+        jwt: userJwt //typescript specific
+    };
+
+    // user created
+    res.status(200).send(existingUser);
+
 })
 
 export {router as signinRouter}

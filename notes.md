@@ -120,3 +120,23 @@ userSchema.set('toJSON', {
     }
 })
 ```
+
+### Route Handlers
+- CurrentUser route handler is used to check if the current user is signed in
+- rest should be self explanatory lol. all testing currently done manually in postman
+- TODO: setup automated testing using a testing library
+
+### Augmenting Type Definitions
+- Typescript doesn't allow for adding new properties using a req.newProp, so we have to modify the type definition
+- We first set up an interface for our request so it knows the types that the payload will have, then
+- To modify the type definition we do something like
+```
+declare global {
+    namespace Express {
+        interface Request {
+            // new properties go here
+            currentUser?: UserPayload
+        }
+    }
+}
+```
