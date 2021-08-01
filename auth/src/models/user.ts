@@ -29,6 +29,18 @@ const userSchema = new mongoose.Schema({
         required: true
     }
 
+}, );
+
+userSchema.set('toJSON', {
+    transform(doc:any, ret:any) {
+        // remap the _id to id
+        ret.id = ret._id;
+        delete ret._id;
+
+        // remove password from returned JSON
+        delete ret.password; 
+        delete ret.__v;
+    }
 })
 
 // mongoose: before saving to database, do something

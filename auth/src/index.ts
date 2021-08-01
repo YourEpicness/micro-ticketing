@@ -2,6 +2,7 @@ import express from 'express';
 import {json} from 'body-parser';
 import 'express-async-errors';
 import mongoose from 'mongoose';
+import cookieSession from 'cookie-session';
 
 //import routers from routes folder
 import { currentUserRouter } from './routes/currentuser';
@@ -12,8 +13,14 @@ import { errorHandler } from './middlewares/error-handler';
 import { NotFoundError } from './errors/not-found-error';
 
 const app = express();
+app.set('trust proxy', true); // used because we are using ingress-nginx as proxy
 app.use(json());
-
+app.use(
+    cookieSession({
+        signed: false,
+        secure: true,
+    })
+)
 // use our imported routes
 app.use(currentUserRouter)
 app.use(signinRouter)
@@ -28,6 +35,11 @@ app.all('*', async (req, res) => {
 app.use(errorHandler)
 
 const start = async () => {
+    // check if keys are loaded
+    if(!process.env.JWT_KEY) {
+        throw new Error('JWT_Key must be defined');
+    }
+
     try {
         await mongoose.connect('mongodb://auth-mongo-srv:27017/auth', {
         useNewUrlParser: true,
