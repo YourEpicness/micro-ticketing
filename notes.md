@@ -140,3 +140,63 @@ declare global {
     }
 }
 ```
+
+## Testing with Microservices
+Whats the scope of our tests?
+- single piece: unit test for single middleware
+- test how different pieces of code work together: integration test for request flowing through multiple middlewares
+- test how different components work together: integration test for making request
+- test how different services work together: e2e for creating a payment and should affect the orders service
+
+We will test each service in isolation instead of seeing the interactions together.
+
+### Testing Goals:
+1. basic request handling
+2. testing models
+3. event emitting and receiving
+
+We wil run tests with npm packages using testing libraries such as Jest, supertest, mocha, or some mocking library.
+
+Steps:
+1. npm run test will run Jest which will:
+2. start an in-memory copy of mongodb
+3. start up express app
+4. use supertest library to make fake requests to exprsss app
+5. run assertions to make sure code works
+   
+To get supertest to play nicely with all the microservices and their ports, we will split up the index.js into an app.js file that isn't listening on a port, so we can use it with supertest.
+
+All the libraries needed include:
+`npm install --save-dev @types/jest @types/supertest jest ts-jest mongodb-memory-server`
+
+### Jest Config for TS
+- under the scripts for test we set up in package.json
+`jest --watchAll --no-cache`
+- In another line before keywords and after scripts, we do some more setup so jest and typescript work together using ts-jest
+```
+"jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "./src/test/setup.ts"
+    ]
+  },
+```
+
+### Other Testing Stuff
+- Retreiving cookies from a header will fail in a test environment due to a setting on cookie-session.
+- To fix we set `process.env.NODE_ENV !== 'test'` on the secure setting like so
+```
+cookieSession({
+    signed: false,
+    secure: process.env.NODE_ENV !== 'test'
+})
+```
+
+- Setting a global interface for a helper function is done like so
+```
+declare global {
+    var signin: () => Promise<string[]>;
+}
+```
+
