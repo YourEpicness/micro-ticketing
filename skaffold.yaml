@@ -16,3 +16,17 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: jbdiop/micro-client
+      context: client
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "**/*.js"
+            dest: .
+          - src: "styles/**/*.css"
+            dest: .
+          - src: "styles/**/*.scss"
+            dest: .
+          - src: "**/*.jsx"
+            dest: .
