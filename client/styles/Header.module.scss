@@ -1,0 +1,39 @@
+.nav-container {
+    background-color: rgb(13, 13, 104);
+
+    .nav {
+        display: flex;
+        background-color: black;
+        color: white;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0.5rem;
+
+        .navbar {
+            display: flex;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            margin: 0 1rem;
+
+            &:hover {
+                color:red;
+            }
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+            margin: 0 1rem;
+        }
+
+        .signout {
+            .list-item {
+            }
+        }
+    }
+}

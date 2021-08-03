@@ -200,3 +200,51 @@ declare global {
 }
 ```
 
+## NextJS Client
+- We are using NextJS because it offers server side rendering. This allows for faster page load times due to the retreival of data from the server instead of slower laod of javascript files from the client.
+- We are making use of hooks and axios to get necessary data from the server. Also making use of getServerSideProps which is not considered a component, so the use of axios is needed instead of the utility useRequest hook.
+
+### Fetching Data with SSR & Kubernetes
+- kubernetes and node retrieve requests from your client that don't have a domain name and append the default of localhost:80(127.0.0.1:80) instead of the actual domain. This is a problem with server side rendering as the browser automatically appends the /request to the existing domain.
+- To fix this we configure axios to use a baseURL of ""
+
+### Cross Namespave Service Communication
+- We will have the client NextJS reach out to ingress nginx to handle routing of requests to services.
+- navigation to localhost:80 lets you reach ingress nginx, does NOT work inside pods
+- To reach out to namespaces we use `kubectl get services -n ingress-nginx` to get the name of the service name
+- Ex: We communicate to `http://ingress-nginx-controller.ingress-nginx.svc.cluster.local` to reach nginx
+- To simplify this, we can create an external name service to map the one above to something simpler like `http://ingress-nginx-srv`
+
+How to know when a request is coming from browser or nextjs?
+- Request from a component
+  - Always use a domain of ""
+- Request from getServerSideProps
+  - Executed from the server
+
+To check we can use this code
+```
+if(typeof window === 'undefined') {
+        // we are on the server!
+        // requests made to long ingress url
+    } else {
+        // we are on the browserr!
+        // requests made with base url of ""
+    }
+```
+
+To use server side rendering with NextJS, we would no longer need to check if route is browser. Our code would look like
+```
+export const getServerSideProps = async ({req}) => {
+    const response = await axios.get('http://ingress-nginx-controller.ingress-nginx.svc.cluster.local/api/users/currentuser', 
+    {
+        headers: req.headers
+    }).catch(err => console.log(err.message));
+
+    
+    return {
+        props: {
+            currentUser: response.data
+        }
+    };
+};
+```

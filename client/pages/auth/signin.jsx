@@ -5,11 +5,11 @@ import useRequest from '../../hooks/use-request';
 import BaseLayout from '../../components/layout/BaseLayout';
 import buildClient from '../../api/build-client';
 
-const SignUp = ({currentUser}) => {
+const SignIn = ({currentUser}) => {
     const [email, setEmail] = useState("");;
     const [password, setPassword] = useState("");
     const { doRequest, errors} = useRequest({
-        url: '/api/users/signup',
+        url: '/api/users/SignIn',
         method:'post',
         body: {
             email, password
@@ -28,12 +28,11 @@ const SignUp = ({currentUser}) => {
        
     }
 
-    console.log(currentUser);
     return (
-        <BaseLayout currentUser={currentUser.currentUser}>
+        <BaseLayout currentUser={currentUser}>
             <div className={styles.form}>
                 <form className={styles.container} onSubmit={onSubmit}>
-                    <h1 className={styles.title}> Sign Up </h1>
+                    <h1 className={styles.title}> Sign In </h1>
                     <div className={styles['form-group']}>
                         <label> Email Address</label>
                         <input className={styles['form-input']} 
@@ -65,4 +64,4 @@ export const getServerSideProps = async (context) => {
     return {props: {currentUser: data}}
 };
 
-export default SignUp;
+export default SignIn;
