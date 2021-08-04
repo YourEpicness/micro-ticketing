@@ -3,8 +3,7 @@ import express, {Request, Response} from 'express';
 import {body} from 'express-validator'; // can validate body, strings, etc
 import jwt from 'jsonwebtoken';
 import { User } from '../models/user';
-import { BadRequestError } from '../errors/bad-request-error';
-import { validateRequest } from '../middlewares/validate-request';
+import { BadRequestError, validateRequest } from '@epicmtickets/common';
 const router = express.Router();
 
 // TODO: Automated API Integration Test for proper signup validation

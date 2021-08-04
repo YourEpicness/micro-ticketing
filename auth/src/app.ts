@@ -9,8 +9,8 @@ import { currentUserRouter } from './routes/currentuser';
 import { signinRouter } from './routes/signin';
 import { signupRouter } from './routes/signup';
 import { signoutRouter } from './routes/signout';
-import { errorHandler } from './middlewares/error-handler';
-import { NotFoundError } from './errors/not-found-error';
+
+import { errorHandler, NotFoundError } from '@epicmtickets/common';
 
 const app = express();
 app.set('trust proxy', true); // used because we are using ingress-nginx as proxy

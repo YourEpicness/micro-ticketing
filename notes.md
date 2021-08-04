@@ -248,3 +248,44 @@ export const getServerSideProps = async ({req}) => {
     };
 };
 ```
+
+## Ticketing Service
+- auth service is handled by JWT and an event bus isn't really needed to interact with other services
+- ticketing service should allow:
+  - list all tickets
+  - show a particular ticket
+  - create a ticket
+  - edit a ticket
+
+3 ways of sharing code with other services
+1. Direct copy and paste of services. Downside is can't sync code. NOT GOOD
+2. Using a git submodule. a way of adding a git repo inside a git repo. allows for code to be in version control. downside is that its complex af.
+3. publish as an npm package to registry. downside: we have to push to npm registry and update, so we will write a script to automate this process
+
+Package Registry Details
+- can publish to NPM public registry, to an organization, or to a private registry
+- we can create a public organization for ourselves which is free
+- To create your own package, we `npm init -y` in a new folder. under name in package.json we specify `@orgname/packagename`
+- We then set up git for our folder by doing 
+```
+git init
+git add .
+git commit -m "initial commit"
+```
+- finally, we do `npm login` then `npm publish --access public`
+- To deal with any language discrepencies, we write the library in Typescript and publish as Javascript
+- We'll set up Typescript in the package by doing
+```
+tsc --init
+npm install typescript del-cli --save-dev
+```
+- we can then create a build script like so `"build":"tsc`
+- under tsconfig, we uncomment the declarative and outDir and set outDir to ./build
+- we can make use of our scripts to build TS by using del-cli like so `"clean": "del-cli ./build/*`
+- our new build command will be `npm run clean && tsc`
+
+We can autoincrement packages using `npm version patch` then use `npm publish`
+- We can make this easier by using a publish script like so
+`"pub":"git add -A && git commit -m \"Updates\" && npm version patch && npm run build && npm publish`
+
+To enable easy access to the files, we can import everything and then export it. We also have to npm install all the necessary packages from the shared libraries
