@@ -8,3 +8,4 @@ An app that allows the user to buy tickets. This implementation uses a micro-ser
 - Docker
 - Kubernetes
 
+To view notes: [here](notes.md)
